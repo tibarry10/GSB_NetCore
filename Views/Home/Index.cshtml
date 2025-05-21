@@ -1,8 +1,10 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewBag.Title = "Accueil";
+    Layout = "~/Views/Shared/_Layout_GSB_Praticien.cshtml";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h2>Accueil</h2>
+<div>
+    <p>
+        Bienvenue dans GSB Praticien <span style="color:red">@ViewData["Nom"]</span>
+    </p>
 </div>
