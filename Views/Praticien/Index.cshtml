@@ -1,5 +1,32 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model System.Data.DataTable
 @{
+    ViewData["Title"] = "Liste des praticiens";
 }
+
+<h2>Liste des praticiens</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Nom complet</th>
+            <th>Ville</th>
+            <th>Spécialités</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>@row["nom_complet"]</td>
+                <td>@row["ville_praticien"]</td>
+                <td>@row["specialites"]</td>
+                <td>
+                    <a class="btn btn-success btn-sm" href="/Praticien/AjouterSpecialite/@row["id_praticien"]">Ajouter</a>
+                    <a class="btn btn-warning btn-sm" href="/Praticien/ModifierSpecialite/@row["id_praticien"]">Modifier</a>
+                    <a class="btn btn-danger btn-sm" href="/Praticien/SupprimerSpecialite/@row["id_praticien"]">Supprimer</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
