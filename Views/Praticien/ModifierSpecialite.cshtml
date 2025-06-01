@@ -1,0 +1,31 @@
+﻿@model GSB_NetCore.Models.Metier.Specialite
+
+@{
+    ViewData["Title"] = "Modifier une spécialité";
+    int idPraticien = (int)ViewBag.IdPraticien;
+}
+
+<h2>Modifier la spécialité</h2>
+
+<form asp-action="ModifierSpecialite" method="post">
+    <input type="hidden" name="idPraticien" value="@idPraticien" />
+    <input type="hidden" name="IdSpecialite" value="@Model.IdSpecialite" />
+
+    <div class="form-group">
+        <label>Spécialité</label>
+        <input type="text" value="@Model.LibSpecialite" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label>Diplôme</label>
+        <input type="text" name="Diplome" value="@Model.Diplome" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Coefficient</label>
+        <input type="number" step="0.01" name="CoefPrescription" value="@Model.CoefPrescription" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-warning">Modifier</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>

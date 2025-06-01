@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Ajouter une spécialité";
+    var specialites = (List<SelectListItem>)ViewBag.LesSpecialites;
+    int idPraticien = ViewBag.IdPraticien;
+}
+
+<h2>Ajouter une spécialité au praticien</h2>
+
+<form asp-action="AjouterSpecialite" method="post">
+    <input type="hidden" name="idPraticien" value="@idPraticien" />
+
+    <div class="form-group">
+        <label for="idSpecialite">Spécialité</label>
+        <select name="idSpecialite" class="form-control">
+            @foreach (var s in specialites)
+            {
+                <option value="@s.Value">@s.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Diplôme</label>
+        <input type="text" name="diplome" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Coefficient de prescription</label>
+        <input type="number" step="0.01" name="coef" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-success">Ajouter</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>

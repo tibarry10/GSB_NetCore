@@ -9,20 +9,36 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Connexion" asp-action="Index">Connexion</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Praticien" asp-action="Index">Praticiens</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Recherche" asp-action="Index">Recherche</a>
-                </li>
+            <ul class="navbar-nav flex-grow-1">
+                @if (Context.Session.GetString("login") == null)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-light" asp-controller="Connexion" asp-action="Index">Connexion</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-light" asp-controller="Home" asp-action="Index">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" asp-controller="Praticien" asp-action="Index">Praticiens</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" asp-controller="Recherche" asp-action="Index">Recherche</a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link text-info">
+                            Connecté : @Context.Session.GetString("login")
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" asp-controller="Connexion" asp-action="Session">Déconnexion</a>
+                    </li>
+                }
             </ul>
+
+
         </div>
     </div>
 </nav>

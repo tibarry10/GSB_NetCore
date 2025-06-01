@@ -3,7 +3,7 @@ using GSB_NetCore.Models.MesExceptions;
 
 namespace GSB_NetCore.Models.Dao
 {
-    public class ServicePraticien
+    public class ServicePraticienSpecialite
     {
         public static DataTable GetTousLesPraticiensAvecSpecialites()
         {
@@ -34,6 +34,14 @@ namespace GSB_NetCore.Models.Dao
             }
         }
 
+        public static DataTable GetToutesLesSpecialites()
+        {
+            string sql = "SELECT id_specialite, lib_specialite FROM specialite ORDER BY lib_specialite";
+            Serreurs er = new Serreurs("Erreur chargement spécialités", "ServicePraticienSpecialite.GetToutesLesSpecialites");
+            return DBInterface.Lecture(sql, er);
+        }
+
+
         public static void AjouterSpecialite(int idPraticien, int idSpecialite, string diplome, double coefPrescription)
         {
             string requete = $@"
@@ -51,6 +59,8 @@ namespace GSB_NetCore.Models.Dao
                 throw e;
 
             }
+            Console.WriteLine("SQL utilisée : " + requete);
+
         }
 
         public static void SupprimerSpecialite(int idPraticien, int idSpecialite)
@@ -89,5 +99,18 @@ namespace GSB_NetCore.Models.Dao
                 throw e;
             }
         }
+
+        public static DataTable GetSpecialiteDuPraticien(int idPraticien, int idSpecialite)
+        {
+            string sql = $@"
+        SELECT s.id_specialite, s.lib_specialite, p.diplome, p.coef_prescription
+        FROM posseder p
+        JOIN specialite s ON p.id_specialite = s.id_specialite
+        WHERE p.id_praticien = {idPraticien} AND p.id_specialite = {idSpecialite}";
+
+            Serreurs er = new Serreurs("Erreur lecture spécialité unique", "GetSpecialiteDuPraticien");
+            return DBInterface.Lecture(sql, er);
+        }
+
     }
 }

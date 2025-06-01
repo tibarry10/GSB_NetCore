@@ -2,6 +2,10 @@
 using GSB_NetCore.Models.Dao;
 using GSB_NetCore.Models.MesExceptions;
 using System.Data;
+using GSB_NetCore.Models.Metier;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 
 namespace GSB_NetCore.Controllers
 {
@@ -11,7 +15,7 @@ namespace GSB_NetCore.Controllers
         {
             try
             {
-                DataTable dt = ServicePraticien.GetTousLesPraticiensAvecSpecialites();
+                DataTable dt = ServicePraticienSpecialite.GetTousLesPraticiensAvecSpecialites();
                 return View(dt);
             }
             catch (MonException e)
@@ -20,5 +24,71 @@ namespace GSB_NetCore.Controllers
                 return View("Error");
             }
         }
+
+        // GET : Ajout
+        public IActionResult AjouterSpecialite(int idPraticien)
+        {
+            var dt = ServicePraticienSpecialite.GetToutesLesSpecialites();
+            var liste = new List<SelectListItem>();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                liste.Add(new SelectListItem
+                {
+                    Value = row["id_specialite"].ToString(),
+                    Text = row["lib_specialite"].ToString()
+                });
+            }
+
+            ViewBag.LesSpecialites = liste;
+
+            ViewBag.IdPraticien = idPraticien;
+            return View();
+        }
+
+        // POST : Ajout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AjouterSpecialite(int idPraticien, int idSpecialite, string diplome, double coef)
+        {
+            ServicePraticienSpecialite.AjouterSpecialite(idPraticien, idSpecialite, diplome, coef);
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult ModifierSpecialite(int idPraticien, int idSpecialite)
+        {
+            var dt = ServicePraticienSpecialite.GetSpecialiteDuPraticien(idPraticien, idSpecialite);
+
+            if (dt.Rows.Count == 0) return NotFound();
+
+            var row = dt.Rows[0];
+            var specialite = new Specialite
+            {
+                IdSpecialite = idSpecialite,
+                LibSpecialite = row["lib_specialite"].ToString(),
+                Diplome = row["diplome"].ToString(),
+                CoefPrescription = Convert.ToDouble(row["coef_prescription"]),
+            };
+
+            ViewBag.IdPraticien = idPraticien;
+            return View(specialite);
+        }
+
+        [HttpPost]
+        public IActionResult ModifierSpecialite(int idPraticien, Specialite specialite)
+        {
+            ServicePraticienSpecialite.ModifierSpecialite(idPraticien, specialite.IdSpecialite, specialite.Diplome, specialite.CoefPrescription);
+            return RedirectToAction("Index");
+        }
+
+
+
+        // Suppression
+        public IActionResult SupprimerSpecialite(int idPraticien, int idSpecialite)
+        {
+            ServicePraticienSpecialite.SupprimerSpecialite(idPraticien, idSpecialite);
+            return RedirectToAction("Index");
+        }
+
     }
 }
