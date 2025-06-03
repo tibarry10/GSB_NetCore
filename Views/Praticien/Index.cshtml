@@ -1,30 +1,40 @@
 ﻿@model System.Data.DataTable
-@{
-    ViewData["Title"] = "Liste des praticiens";
-}
+@using System.Data
 
 <h2>Liste des praticiens avec leurs spécialités</h2>
 
-<table class="table table-bordered table-striped">
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>Nom complet</th>
             <th>Ville</th>
-            <th>Spécialités</th>
+            <th>Spécialité</th>
             <th>Gérer les spécialités</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (System.Data.DataRow row in Model.Rows)
+        @foreach (DataRow row in Model.Rows)
         {
             <tr>
                 <td>@row["nom_complet"]</td>
                 <td>@row["ville_praticien"]</td>
                 <td>@row["specialites"]</td>
                 <td>
-                    <a class="btn btn-success btn-sm" href="/Praticien/AjouterSpecialite/@row["id_praticien"]">Ajouter</a>
-                    <a class="btn btn-warning btn-sm" href="/Praticien/ModifierSpecialite/@row["id_praticien"]">Modifier</a>
-                    <a class="btn btn-danger btn-sm" href="/Praticien/SupprimerSpecialite/@row["id_praticien"]">Supprimer</a>
+                    <a asp-action="AjouterSpecialite"
+                       asp-route-idPraticien="@row["id_praticien"]"
+                       class="btn btn-success">Ajouter</a>
+
+                    <a asp-action="SelectionnerSpecialitePourModification"
+                       asp-route-idPraticien="@row["id_praticien"]"
+                       class="btn btn-warning">Modifier</a>
+
+
+
+                    <a asp-action="SelectionnerSpecialitePourSuppression"
+                       asp-route-idPraticien="@row["id_praticien"]"
+                       class="btn btn-danger">Supprimer</a>
+
+
                 </td>
             </tr>
         }

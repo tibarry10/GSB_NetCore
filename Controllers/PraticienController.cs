@@ -51,6 +51,13 @@ namespace GSB_NetCore.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AjouterSpecialite(int idPraticien, int idSpecialite, string diplome, double coef)
         {
+            // Vérification simple (facultative)
+            if (idPraticien <= 0)
+            {
+                ModelState.AddModelError("Erreur", "Praticien invalide.");
+                return RedirectToAction("Index");
+            }
+
             ServicePraticienSpecialite.AjouterSpecialite(idPraticien, idSpecialite, diplome, coef);
             return RedirectToAction("Index");
         }
@@ -81,10 +88,57 @@ namespace GSB_NetCore.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult SelectionnerSpecialitePourModification(int idPraticien)
+        {
+            ViewBag.IdPraticien = idPraticien;
+            ViewBag.LesSpecialites = ServicePraticienSpecialite.GetSpecialitesPourPraticienSelectList(idPraticien);
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult SelectionnerSpecialitePourModification(int idPraticien, int idSpecialite)
+        {
+            return RedirectToAction("ModifierSpecialite", new { idPraticien, idSpecialite });
+        }
+
+        public IActionResult SelectionnerSpecialitePourSuppression(int idPraticien)
+        {
+            ViewBag.IdPraticien = idPraticien;
+            ViewBag.LesSpecialites = ServicePraticienSpecialite.GetSpecialitesPourPraticienSelectList(idPraticien);
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult SelectionnerSpecialitePourSuppression(int idPraticien, int idSpecialite)
+        {
+            return RedirectToAction("SupprimerSpecialite", new { idPraticien, idSpecialite });
+        }
+
 
 
         // Suppression
+        // GET
         public IActionResult SupprimerSpecialite(int idPraticien, int idSpecialite)
+        {
+            var dt = ServicePraticienSpecialite.GetSpecialiteDuPraticien(idPraticien, idSpecialite);
+            if (dt.Rows.Count == 0) return NotFound();
+
+            var row = dt.Rows[0];
+            var specialite = new Specialite
+            {
+                IdSpecialite = idSpecialite,
+                LibSpecialite = row["lib_specialite"].ToString(),
+                Diplome = row["diplome"].ToString(),
+                CoefPrescription = Convert.ToDouble(row["coef_prescription"]),
+            };
+
+            ViewBag.IdPraticien = idPraticien;
+            return View(specialite);
+        }
+
+        // POST
+        [HttpPost]
+        public IActionResult ConfirmerSuppressionSpecialite(int idPraticien, int idSpecialite)
         {
             ServicePraticienSpecialite.SupprimerSpecialite(idPraticien, idSpecialite);
             return RedirectToAction("Index");

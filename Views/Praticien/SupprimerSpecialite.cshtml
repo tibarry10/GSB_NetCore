@@ -1,0 +1,16 @@
+﻿@model GSB_NetCore.Models.Metier.Specialite
+@{
+    ViewData["Title"] = "Confirmation suppression spécialité";
+    int idPraticien = (int)ViewBag.IdPraticien;
+}
+
+<h2>Confirmer la suppression</h2>
+
+<p>Voulez-vous vraiment supprimer la spécialité <strong>@Model.LibSpecialite</strong> du praticien ?</p>
+
+<form asp-action="ConfirmerSuppressionSpecialite" method="post">
+    <input type="hidden" name="idPraticien" value="@ViewBag.IdPraticien" />
+    <input type="hidden" name="idSpecialite" value="@Model.IdSpecialite" />
+    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>

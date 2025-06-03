@@ -1,5 +1,7 @@
 ﻿using System.Data;
 using GSB_NetCore.Models.MesExceptions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GSB_NetCore.Models.Dao
 {
@@ -7,32 +9,22 @@ namespace GSB_NetCore.Models.Dao
     {
         public static DataTable GetTousLesPraticiensAvecSpecialites()
         {
-            DataTable dt;
-            Serreurs er = new Serreurs("Erreur lors de la lecture des praticiens.", "ServicePraticien.GetTousLesPraticiensAvecSpecialites()");
+            string sql = @"
+            SELECT 
+    p.id_praticien,
+    CONCAT(p.nom_praticien, ' ', p.prenom_praticien) AS nom_complet,
+    p.ville_praticien,
+    GROUP_CONCAT(s.lib_specialite SEPARATOR ', ') AS specialites
+FROM praticien p
+LEFT JOIN posseder ps ON p.id_praticien = ps.id_praticien
+LEFT JOIN specialite s ON ps.id_specialite = s.id_specialite
+GROUP BY p.id_praticien, p.nom_praticien, p.prenom_praticien, p.ville_praticien
+ORDER BY p.nom_praticien";
 
-            try
-            {
-                string requete = @"
-                    SELECT 
-                        praticien.id_praticien,
-                        CONCAT(prenom_praticien, ' ', nom_praticien) AS nom_complet,
-                        ville_praticien,
-                        GROUP_CONCAT(specialite.lib_specialite SEPARATOR ', ') AS specialites
-                    FROM praticien
-                    LEFT JOIN posseder ON praticien.id_praticien = posseder.id_praticien
-                    LEFT JOIN specialite ON posseder.id_specialite = specialite.id_specialite
-                    GROUP BY praticien.id_praticien, nom_praticien, prenom_praticien, ville_praticien
-                    ORDER BY nom_praticien, prenom_praticien
-                ";
-
-                dt = DBInterface.Lecture(requete, er);
-                return dt;
-            }
-            catch (MonException e)
-            {
-                throw new MonException(er.MessageUtilisateur(), er.MessageApplication(), e.Message);
-            }
+            Serreurs er = new Serreurs("Erreur chargement praticiens avec spécialités", "GetTousLesPraticiensAvecSpecialites()");
+            return DBInterface.Lecture(sql, er);
         }
+
 
         public static DataTable GetToutesLesSpecialites()
         {
@@ -62,6 +54,19 @@ namespace GSB_NetCore.Models.Dao
             Console.WriteLine("SQL utilisée : " + requete);
 
         }
+
+        public static DataTable GetSpecialiteDuPraticien(int idPraticien, int idSpecialite)
+        {
+            string sql = $@"
+        SELECT p.id_specialite, s.lib_specialite, p.diplome, p.coef_prescription
+        FROM posseder p
+        JOIN specialite s ON p.id_specialite = s.id_specialite
+        WHERE p.id_praticien = {idPraticien} AND p.id_specialite = {idSpecialite}";
+
+            Serreurs er = new Serreurs("Erreur chargement spécialité", "GetSpecialiteDuPraticien()");
+            return DBInterface.Lecture(sql, er);
+        }
+
 
         public static void SupprimerSpecialite(int idPraticien, int idSpecialite)
         {
@@ -100,17 +105,30 @@ namespace GSB_NetCore.Models.Dao
             }
         }
 
-        public static DataTable GetSpecialiteDuPraticien(int idPraticien, int idSpecialite)
+        public static List<SelectListItem> GetSpecialitesPourPraticienSelectList(int idPraticien)
         {
+            List<SelectListItem> liste = new List<SelectListItem>();
             string sql = $@"
-        SELECT s.id_specialite, s.lib_specialite, p.diplome, p.coef_prescription
+        SELECT s.id_specialite, s.lib_specialite
         FROM posseder p
         JOIN specialite s ON p.id_specialite = s.id_specialite
-        WHERE p.id_praticien = {idPraticien} AND p.id_specialite = {idSpecialite}";
+        WHERE p.id_praticien = {idPraticien}";
 
-            Serreurs er = new Serreurs("Erreur lecture spécialité unique", "GetSpecialiteDuPraticien");
-            return DBInterface.Lecture(sql, er);
+            DataTable dt = DBInterface.Lecture(sql, new Serreurs("Erreur chargement spécialités", "Service"));
+
+            foreach (DataRow row in dt.Rows)
+            {
+                liste.Add(new SelectListItem
+                {
+                    Value = row["id_specialite"].ToString(),
+                    Text = row["lib_specialite"].ToString()
+                });
+            }
+
+            return liste;
         }
+
+
 
     }
 }
